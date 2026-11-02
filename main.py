@@ -1,3 +1,19 @@
+import os
+from aiohttp import web
+import asyncio
+
+async def handle(request):
+    return web.Response(text="Bot is running!")
+
+async def start_background_web_server():
+    app = web.Application()
+    app.router.add_get("/", handle)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    port = int(os.environ.get("PORT", 8080))
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+
 import asyncio
 import sqlite3
 import re
@@ -325,6 +341,8 @@ async def main():
     init_db()
     print("🚀 [ВЕРСИЯ: DOST v5.0 - Оплата на карту Abdumomin abdurahmanov + Связь с менеджером @abddumomin] Бот запущен!")
     await dp.start_polling(bot)
-
+await start_background_web_server()
+    await dp.start_polling(bot)
+    
 if __name__ == "__main__":
     asyncio.run(main())
