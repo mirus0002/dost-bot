@@ -642,12 +642,8 @@ async def process_job_salary(message: types.Message, state: FSMContext):
         ]
 
     )
-
-    
-
-   pay_text = t['pay_info'].format(amount=formatted_commission)
-    
-    preview_text = (
+    pay_text = t['pay_info'].format(amount=formatted_commission)
+        preview_text = (
         f"📋 **DOST | Ваше объявление:**\n\n"
         f"📌 **Работа:** {job_data['title']}\n"
         f"📝 **Описание:** {job_data['description']}\n"
@@ -655,8 +651,7 @@ async def process_job_salary(message: types.Message, state: FSMContext):
         f"──────────────────\n"
         f"{pay_text}"
     )
-    
-    await message.answer(preview_text, reply_markup=pay_kb, parse_mode="Markdown")
+        await message.answer(preview_text, reply_markup=pay_kb, parse_mode="Markdown")
     await state.clear()
 
 
