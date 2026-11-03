@@ -1,13 +1,8 @@
 import os
-from aiohttp import web
 import asyncio
-
+import logging
 from aiohttp import web
-
-import asyncio
-
-
-
+from aiogram import Bot, Dispatcher
 async def handle(request):
 
     return web.Response(text="Bot is running!")
@@ -650,42 +645,46 @@ async def process_job_salary(message: types.Message, state: FSMContext):
 
     
 
-    pay_text = t['pay_info'].format(amount=formatted_commission)
-
+   pay_text = t['pay_info'].format(amount=formatted_commission)
     
-
     preview_text = (
-
         f"📋 **DOST | Ваше объявление:**\n\n"
-
         f"📌 **Работа:** {job_data['title']}\n"
-
         f"📝 **Описание:** {job_data['description']}\n"
-
         f"💰 **Оплата работнику:** {job_data['salary']}\n\n"
-
         f"──────────────────\n"
-
         f"{pay_text}"
-
     )
-
     
-
     await message.answer(preview_text, reply_markup=pay_kb, parse_mode="Markdown")
-
     await state.clear()
 
+
+# === 1. ВЕБ-СЕРВЕР ДЛЯ UPTIMEROBOT ===
+async def handle(request):
+    return web.Response(text="Bot is running!")
+
+async def start_background_web_server():
+    app = web.Application()
+    app.router.add_get("/", handle)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    port = int(os.environ.get("PORT", 8080))
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+
+
+# === 2. ЕДИНАЯ ТОЧКА ЗАПУСКА БОТА ===
 async def main():
-    init_db()
-    print("🚀 [ВЕРСИЯ: DOST v5.0 - Оплата на карту Abdumomin abdurahmanov + Связь с менеджером @abddumomin] Бот запущен!")
+    # Запускаем базы данных
+    await init_db()  # если функция асинхронная, не забудь await
     
-    # Сначала запускаем веб-сервер для Render
-    await start_background_web_server()
+    # Фоном запускаем веб-сервер
+    asyncio.create_task(start_background_web_server())
     
-    # Затем запускаем опрос бота (только 1 раз!)
+    print("🚀 [DOST v5.0] Бот успешно запущен!")
     await dp.start_polling(bot)
-      
+
+
 if __name__ == "__main__":
     asyncio.run(main())
-
